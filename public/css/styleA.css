@@ -1,0 +1,190 @@
+/* =========================
+   LAYOUT GENERAL LOGIN
+   ========================= */
+.login-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+}
+
+.login-left,
+.login-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+ /* =========================
+   RESET BÁSICO
+   ========================= */
+* {
+    box-sizing: border-box;
+}
+
+/* =========================
+   CONTENEDOR GENERAL LLAVE MX
+   ========================= */
+.container-llaveMX {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 0; 
+}
+
+
+/* =========================
+   CAJA DEL LOGIN
+   ========================= */
+.container-llaveMX .boxLogin {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+/* =========================
+   TARJETA BLANCA (CARD)
+   ========================= */
+.container-llaveMX .right-section {
+    background-color: #ffffff;              /* Fondo blanco real */
+    max-width: 539px;                        /* Tamaño como el diseño */
+    width: 100%;
+    max-height: 252px;
+    height: 100%;
+    padding: 40px 32px;                      /* Espaciado interno */
+    border-radius: 12px;                     /* Bordes suaves */
+    box-shadow: 0 6px 18px rgba(0,0,0,.12);  /* Sombra tipo gob.mx */
+    text-align: center;                      /* Todo centrado */
+}
+
+/* =========================
+   LOGO LLAVE MX
+   ========================= */
+.container-llaveMX .right-section img {
+    height: 56px;
+    margin-bottom: 32px;
+}
+
+/* =========================
+   BOTONES
+   ========================= */
+.container-llaveMX .login-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: "Noto Sans", sans-serif;
+}
+
+/* Botón principal */
+.container-llaveMX .login-button {
+    background-color: #611232;
+    color: #ffffff;
+}
+
+/* Botón secundario */
+.container-llaveMX .login-button.cuenta {
+    background-color: #ffffff;
+    color: #611232;
+    border: 1px solid #611232;
+}
+
+/* =========================
+   BOTONES EN FILA
+   ========================= */
+.login-buttons-row {
+    display: flex;
+    gap: 12px;
+}
+
+.login-buttons-row .login-button {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+/* =========================
+   TÉRMINOS Y CONDICIONES
+   ========================= */
+.acciones {
+    margin-top: 16px;
+    text-align: left;
+}
+
+.acciones .terminos {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.4;
+    font-family: "Noto Sans", sans-serif;
+}
+.acciones .terminos a {
+    color: #611232;
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+.acciones .terminos a:hover {
+    text-decoration: underline;
+}
+/* =========================
+   MENSAJES / ALERTAS
+   ========================= */
+.container-llaveMX .alert {
+    margin-bottom: 16px;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+@media (max-width: 768px) {
+
+    body.login-page {
+        background-image: url('/css/images/fondo.png');
+        background-size: cover;
+        background-position: center top;
+        background-repeat: no-repeat;
+    }
+
+    .login-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    /* ===== Logos arriba de la card ===== */
+    .login-left {
+        padding: 32px 16px 16px;
+        text-align: center;
+    }
+
+    .login-left img:first-child {
+        width: 260px;
+        max-width: 100%;
+        margin-bottom: 12px;
+    }
+
+    .login-left img:last-child {
+        width: 320px;
+        max-width: 100%;
+    }
+
+    /* ===== Card ===== */
+    .login-right {
+        padding: 16px 16px 60px;
+        align-items: flex-start;
+    }
+
+    .container-llaveMX {
+        margin-top: 16px;
+    }
+
+    .container-llaveMX .right-section {
+        max-width: 100%;
+        border-radius: 16px;
+        padding: 32px 24px;
+    }
+}
