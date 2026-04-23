@@ -5,7 +5,9 @@
 
         {{-- Botón añadir filtro --}}
         <button wire:click="addFilter" class="btn btn-sm btn-outline gap-2">
-            <span class="material-symbols-outlined" style='font-size:15px'>add</span>
+            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
             Añadir filtro
             @if($this->activeFilterCount() > 0)
                 <span class="badge badge-primary badge-sm">{{ $this->activeFilterCount() }}</span>
@@ -18,11 +20,11 @@
                 <button
                     wire:click="$set('filterOperator', 'AND')"
                     class="join-item btn btn-xs {{ $filterOperator === 'AND' ? 'btn-primary' : 'btn-outline' }}"
-                >Y</button>
+                >AND</button>
                 <button
                     wire:click="$set('filterOperator', 'OR')"
                     class="join-item btn btn-xs {{ $filterOperator === 'OR' ? 'btn-primary' : 'btn-outline' }}"
-                >O</button>
+                >OR</button>
             </div>
 
             <span class="text-xs text-base-content/50">
@@ -42,7 +44,12 @@
 
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-outline btn-sm gap-1.5">
-                    <span class="material-symbols-outlined" style="font-size: 15px">grid_view</span>
+                    <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
                     Columnas
                 </div>
                 <ul tabindex="0"
@@ -78,11 +85,7 @@
                         {{ $index === 0
                             ? 'text-base-content/40'
                             : ($filterOperator === 'AND' ? 'text-primary' : 'text-warning') }}">
-                        {{ 
-                            $index === 0 
-                            ? 'Sí' 
-                            :$filterOperator
-                        }}
+                        {{ $index === 0 ? 'si' : $filterOperator }}
                     </span>
 
                     {{-- Selector de columna --}}
@@ -118,8 +121,10 @@
                         type="text"
                         class="input input-bordered input-sm flex-1 min-w-32"
                         placeholder="Valor..."
-                        wire:model.live.debounce.300ms="filters.{{ $index }}.value"
-                    />
+                        value="{{ $filter['value'] ?? '' }}"
+                        wire:change="updateFilter({{ $index }}, 'value', $event.target.value)"
+                        wire:keyup.debounce.300ms="updateFilter({{ $index }}, 'value', $event.target.value)"
+                    >
 
                     {{-- Eliminar filtro --}}
                     <button
@@ -127,7 +132,9 @@
                         class="btn btn-ghost btn-sm btn-square text-base-content/40 hover:text-error"
                         title="Eliminar filtro"
                     >
-                        <span class="material-symbols-outlined" style='font-size:15px'>close</span>
+                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
                     </button>
                 </div>
             @endforeach
@@ -165,7 +172,7 @@
 
     {{-- ═══ TABLA ═══ --}}
     <div class="border border-base-300 rounded-box overflow-auto">
-        <table class="table table-zebra table-xs md:table-md w-full">
+        <table class="table table-zebra table-sm w-full">
             <thead class="bg-base-200/50">
                 <tr>
                     @foreach($columns as $key => $col)
@@ -174,7 +181,7 @@
                             wire:click="{{ ($col['sortable'] ?? true) ? 'sort(\''.$key.'\')' : '' }}"
                             class="{{ ($col['sortable'] ?? true) ? 'cursor-pointer hover:bg-base-300/40' : '' }}
                                    {{ $sortColumn === $key ? 'text-primary' : '' }}
-                                   whitespace-nowrap select-none transition-colors uppercase text-xs"
+                                   whitespace-nowrap select-none transition-colors"
                             style="{{ isset($col['width']) ? 'width:'.$col['width'] : '' }}"
                         >
                             <span class="inline-flex items-center gap-1.5">
@@ -193,27 +200,69 @@
             </thead>
 
             <tbody>
-                <tr>
-                    @foreach($this->visibleColumns() as $col)
-                    <td>
-                            @switch(true)
-        
-                                @case($col instanceof \App\Support\DataTable\Columns\BadgeColumn)
-                                    <span class="badge {{ $col->colors[$row->{$col->key}] ?? 'badge-ghost' }}">
-                                        {{ $row->{$col->key} }}
-                                    </span>
-                                @break
-        
-                                @case($col instanceof \App\Support\DataTable\Columns\ProgressColumn)
-                                    <progress class="progress w-full" value="{{ $row->{$col->key} }}" max="100"></progress>
-                                @break
-        
-                                @default
-                                    {{ data_get($row, $col->key) }}
-                            @endswitch
+                @forelse($this->rows as $row)
+                    <tr class="hover">
+                        @foreach($columns as $key => $col)
+                            @continue(in_array($key, $hiddenColumns))
+                            <td class="{{ $col['class'] ?? '' }}">
+                                @if(isset($col['badge']))
+                                    @php
+                                        $val   = $this->getCellValue($row, $key);
+                                        $color = $col['badge'][$val] ?? 'badge-neutral';
+                                    @endphp
+                                    <span class="badge {{ $color }} badge-sm font-medium">{{ $val }}</span>
+
+                                @elseif(isset($col['render']))
+                                    {!! $this->getCellValue($row, $key) !!}
+
+                                @else
+                                    {{-- Resaltado de términos buscados --}}
+                                    @php
+                                        $cellVal     = $this->getCellValue($row, $key);
+                                        $activeTerms = array_filter(
+                                            $filters,
+                                            fn($f) => ($f['col'] ?? '') === $key && trim($f['value'] ?? '') !== ''
+                                                   && in_array($f['operator'] ?? '', ['contains','starts_with','ends_with'])
+                                        );
+                                    @endphp
+
+                                    @if(count($activeTerms))
+                                        @php
+                                            $highlighted = e($cellVal);
+                                            foreach ($activeTerms as $af) {
+                                                $term = e($af['value']);
+                                                $highlighted = preg_replace(
+                                                    '/('.preg_quote($term, '/').')/i',
+                                                    '<mark class="bg-primary/20 text-primary rounded px-0.5">$1</mark>',
+                                                    $highlighted
+                                                );
+                                            }
+                                        @endphp
+                                        <span class="truncate block max-w-xs">{!! $highlighted !!}</span>
+                                    @else
+                                        <span class="truncate block max-w-xs" title="{{ $cellVal }}">
+                                            {{ $cellVal }}
+                                        </span>
+                                    @endif
+                                @endif
+                            </td>
+                        @endforeach
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="{{ count($this->visibleColumns()) }}" class="text-center py-16">
+                            <div class="flex flex-col items-center gap-3 text-base-content/40">
+                                <svg class="size-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a1 1 0 0 1-.293.707L13 13.414V19a1 1 0 0 1-.553.894l-4 2A1 1 0 0 1 7 21v-7.586L3.293 6.707A1 1 0 0 1 3 6V4z"/>
+                                </svg>
+                                <p class="text-sm font-medium">Sin resultados</p>
+                                <button wire:click="clearFilters" class="btn btn-ghost btn-xs">
+                                    Limpiar filtros
+                                </button>
+                            </div>
                         </td>
-                    @endforeach
-                </tr>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
 

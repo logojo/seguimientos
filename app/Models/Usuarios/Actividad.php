@@ -8,10 +8,13 @@ use App\Models\Catalogos\CatEstrategia;
 use App\Models\Catalogos\CatLineaAccion;
 use App\Models\Catalogos\CatPrograma;
 use App\Models\Catalogos\CatUnidadMedida;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Actividad extends Model
 {
+    use HasFactory;
+
     protected $connection = 'base';
     protected $table = 'usuarios.actividades';
 

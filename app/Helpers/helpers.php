@@ -51,3 +51,14 @@ function toast($message, $action, $title = null, $position = 'top-end', $timer =
         ->timer($timer)
         ->show();
 }
+
+function confirm( $model ) {
+  LivewireAlert::title('¿Estás seguro de eliminar?')
+    ->text('Este registro será eliminado permanentemente.')
+    ->question()
+    ->withConfirmButton('Sí, eliminar')
+    ->withCancelButton('Cancelar')
+    ->onConfirm('delete', ['model' => $model])
+    ->timer(10000)
+    ->show();
+}

@@ -3,7 +3,7 @@
     <x-modal 
         id="actividad"
         button="Registrar nueva actividad" 
-        title=" Registrar nueva actividad" 
+        title=" Adminitrar actividad" 
         icon="bubble"
     >
        
@@ -28,13 +28,13 @@
             
                     <div class="w-full">
                         <legend class="fieldset-legend text-sm font-bold text-neutral">Unidad de medida</legend>
-                        <select class="select" wire:model="unidad_id">
+                        <select class="select" wire:model="unidad_medida_id">
                             <option>--- Seleccione ---</option>
                             @foreach ($catalogos['unidades_medida'] as $unidad_medida)
                             <option value="{{ $unidad_medida->id }}">{{ $unidad_medida->descripcion }}</option>
                             @endforeach
                         </select>
-                        <x-input-error for='unidad_id' /> 
+                        <x-input-error for='unidad_medida_id' /> 
                     </div>
             
                     <div class="w-full" wire:key="programa-select-{{ $programa_id }}">

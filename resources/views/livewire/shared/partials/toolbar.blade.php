@@ -4,8 +4,12 @@
     <div class="flex items-center gap-2">
 
         {{-- Agregar filtro --}}
-        <button wire:click="addFilter" class="btn btn-sm btn-primary">
-            + Filtro
+        <button wire:click="addFilter" class="btn btn-sm btn-outline gap-2">
+            + Añadir filtro
+            @if( count($filters) > 0 )
+            <span class="badge badge-primary badge-sm">{{ count($filters) }}</span>
+            @endif
+            
         </button>
 
         {{-- Limpiar filtros --}}
@@ -15,9 +19,7 @@
             </button>
         @endif
 
-        <div wire:loading class="space-y-2">
-            <span class="loading loading-bars loading-sm"></span>
-        </div>
+       @include('livewire.shared.partials.loading')
 
     </div>
 
@@ -27,6 +29,7 @@
         {{-- Columnas --}}
         <div class="dropdown dropdown-end">
             <label tabindex="0" class="btn btn-sm">
+                <span class="material-symbols-outlined" style="font-size: 15px">grid_view</span>
                 Columnas
             </label>
 
@@ -39,7 +42,7 @@
                                    wire:click="toggleColumn('{{ $col->key }}')"
                                    @checked(!in_array($col->key, $hiddenColumns))
                             >
-                            {{ $col->label }}
+                            {{ $col->label === '' ? 'Seguimiento' : $col->label  }}
                         </label>
                     </li>
                 @endforeach

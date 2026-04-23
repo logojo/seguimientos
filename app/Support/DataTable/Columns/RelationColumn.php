@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Support\DataTable;
+namespace App\Support\DataTable\Columns;
 
 class RelationColumn extends Column
 {

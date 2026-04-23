@@ -12,6 +12,7 @@ use App\Models\Usuarios\Actividad;
 use App\Services\UserAssigmentService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -20,6 +21,8 @@ class FormSeguimientos extends Component
     public bool $open = false;
     public $catalogos;
 
+    public int $actividadId = 0;
+
     #[Validate('required')]
     public $actividad;
 
@@ -27,7 +30,7 @@ class FormSeguimientos extends Component
     public $objetivo;
 
     #[Validate('required', as:'unidad de medida')]
-    public $unidad_id;
+    public $unidad_medida_id;
 
     #[Validate('required')]
     public $programa_id;
@@ -46,9 +49,15 @@ class FormSeguimientos extends Component
     }
 
     public function save() {
+        $this->actividadId > 0
+        ? $this->update()
+        : $this->store();
+    }
+
+    public function store() {
         $this->validate();
 
-        //todo: hasta que se tenga el control de usiarios completo
+        //todo: hasta que se tenga el actividad de usiarios completo
         // $service = app(UserAssigmentService::class);
         // $assignment = $service->currentAssignment( Auth::user() );
 
@@ -60,14 +69,46 @@ class FormSeguimientos extends Component
             //'user_assignment_id' => $this->assignment->id,
             'programa_id' => $this->programa_id,
             'dependencia_id' => $this->dependencia_id,
-            'unidad_medida_id' => $this->unidad_id,
+            'unidad_medida_id' => $this->unidad_medida_id,
             'estrategia_id' => $this->estrategia_id,
             'linea_accion_id' => $this->linea_accion_id,
         ]);
 
         $this->clear();
-        $this->dispatch('render-actividades');
+        $this->dispatch('render-table');
         toast('Actividad agregada con exito!', 'success');
+    }
+
+    #[On('edit-actividad')]
+    public function edit(Actividad $actividad) {      
+        $this->actividadId = $actividad->id;
+        $this->actividad = $actividad->actividad;      
+        $this->objetivo = $actividad->objetivo;      
+        $this->unidad_medida_id = $actividad->unidad_medida_id;       
+        $this->programa_id = $actividad->programa_id;       
+        $this->dependencia_id = $actividad->dependencia_id;       
+        $this->estrategia_id = $actividad->estrategia_id;       
+        $this->linea_accion_id = $actividad->linea_accion_id;       
+        $this->open = true;
+    }
+
+    public function update() {
+        $actividad = Actividad::find($this->actividadId);
+        $actividad->fill($this->only([
+            'actividad',
+            'objetivo',
+            'programa_id',
+            'dependencia_id',
+            'unidad_medida_id',
+            'estrategia_id',
+            'linea_accion_id',
+        ]));
+
+        $actividad->save();
+
+        $this->clear();
+        $this->dispatch('render-table');
+        toast('Actividad modificada con exito!', 'success');
     }
 
     private function loadCatalogos(): void
@@ -87,9 +128,32 @@ class FormSeguimientos extends Component
         }
     }
 
+    #[On('delete-actividad')]
+    public function onConfirm(Actividad $actividad ) {
+       confirm( $actividad );
+    }
+
+    public function delete(Actividad $actividad)
+    {
+        //todo: revisar validacion para eliminar
+        $actividad->delete();
+
+        $this->clear();
+        $this->dispatch('render-table');
+        toast('Actividad eliminada con exito!', 'success');
+        
+    }
+
+
     public function clear() {
         $this->resetValidation();
         $this->resetExcept(['catalogos']);
+    }
+
+    #[On('clear-form')]
+    public function clearForm() {
+        $this->resetValidation();
+        $this->resetExcept(['catalogos','open']);
     }
 
     public function render()

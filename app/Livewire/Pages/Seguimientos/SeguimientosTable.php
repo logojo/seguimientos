@@ -3,10 +3,13 @@
 namespace App\Livewire\Pages\Seguimientos;
 
 use App\Livewire\Shared\DataTable;
-use App\Support\DataTable\BadgeColumn;
-use App\Support\DataTable\ProgressColumn;
-use App\Support\DataTable\RelationColumn;
-use App\Support\DataTable\TextColumn;
+use App\Support\DataTable\Columns\ActionsColumn;
+use App\Support\DataTable\Columns\BadgeColumn;
+use App\Support\DataTable\Columns\IconColumn;
+use App\Support\DataTable\Columns\ProgressColumn;
+use App\Support\DataTable\Columns\RelationColumn;
+use App\Support\DataTable\Columns\TextColumn;
+use Carbon\Carbon;
 
 class SeguimientosTable extends DataTable
 {
@@ -33,13 +36,16 @@ class SeguimientosTable extends DataTable
         return [
 
             BadgeColumn::make('status')
-                ->label('Estado')
+                ->label('Estatus de registro')
                 ->type('enum')
                 ->colors([
                     'Validada'  => 'pill-green',
                     'Pendiente' => 'pill-gray',
                     'Observada' => 'pill-yellow',
                 ]),
+            
+            IconColumn::make('')
+                 ->type('icon'),
 
             TextColumn::make('actividad')
                 ->label('Actividad')
@@ -56,8 +62,48 @@ class SeguimientosTable extends DataTable
                 ->sortable(),
                 
             ProgressColumn::make('avance')
+                ->label('Avance %')
                ->type('numeric'),
+
+            ActionsColumn::make('actions')
+                ->label('Acciones')
+                ->actions([
+                    [
+                        'label' => 'Editar',
+                        'icon' => 'edit',
+                        'action' => 'edit',
+                        'class' => 'primary',
+                    ],
+                    [
+                        'label' => 'Registrar avance',
+                        'icon' => 'trending_up',
+                        'action' => 'reportar',
+                        'class' => 'accent',
+                    ],
+                    [
+                        'label' => 'Eliminar',
+                        'icon' => 'delete',
+                        'action' => 'delete',
+                        'class' => 'error',
+                        'visible' => fn($row) => $row->status !== 'Validada',
+                    ],
+                ]),
         ];
+    }
+
+    public function edit($id)
+    {
+        $this->dispatch('edit-actividad', actividad: $id );
+    }
+
+    public function delete($id)
+    {
+        $this->dispatch('delete-actividad', actividad: $id );
+    }
+
+    public function reportar($id)
+    {
+        // ejecutar  / redireccionar
     }
 
     // protected function columns(): array
