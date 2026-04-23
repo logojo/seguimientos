@@ -7,7 +7,6 @@ use App\Support\DataTable\BadgeColumn;
 use App\Support\DataTable\ProgressColumn;
 use App\Support\DataTable\RelationColumn;
 use App\Support\DataTable\TextColumn;
-use Carbon\Carbon;
 
 class SeguimientosTable extends DataTable
 {
@@ -30,32 +29,36 @@ class SeguimientosTable extends DataTable
     }
 
     protected function columns(): array
-{
-    return [
+    {
+        return [
 
-        BadgeColumn::make('status')
-            ->label('Estado')
-            ->colors([
-                'Validada'  => 'badge-success',
-                'Pendiente' => 'badge-neutral',
-                'Observada' => 'badge-warning',
-            ]),
+            BadgeColumn::make('status')
+                ->label('Estado')
+                ->type('enum')
+                ->colors([
+                    'Validada'  => 'pill-green',
+                    'Pendiente' => 'pill-gray',
+                    'Observada' => 'pill-yellow',
+                ]),
 
-        TextColumn::make('actividad')
-            ->label('Actividad')
-            ->sortable(),
+            TextColumn::make('actividad')
+                ->label('Actividad')
+                ->type('string')
+                ->sortable(),
 
-        RelationColumn::make('programa')
-            ->relation('programa.descripcion')
-            ->sortable(),
-
-        RelationColumn::make('dependencia')
-            ->relation('dependencia.descripcion')
-            ->sortable(),
-
-        ProgressColumn::make('avance'),
-    ];
-}
+            RelationColumn::make('programa')
+                ->relation('programa.descripcion')
+                ->sortable(),
+                
+                
+            RelationColumn::make('dependencia')
+                ->relation('dependencia.descripcion')
+                ->sortable(),
+                
+            ProgressColumn::make('avance')
+               ->type('numeric'),
+        ];
+    }
 
     // protected function columns(): array
     // {

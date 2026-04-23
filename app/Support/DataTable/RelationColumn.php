@@ -11,4 +11,13 @@ class RelationColumn extends Column
         $this->relation = $relation;
         return $this;
     }
+
+    public function resolve($row): mixed
+    {
+        if (!$this->relation) {
+            return parent::resolve($row);
+        }
+
+        return data_get($row, $this->relation) ?? '—';
+    }
 }

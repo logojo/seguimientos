@@ -7,11 +7,19 @@ abstract class Column
     public string $key;
     public string $label;
     public bool $sortable = false;
+    public string $type = 'string';
 
+    
     public function __construct(string $key)
     {
         $this->key = $key;
         $this->label = ucfirst($key);
+    }
+    
+    public function type(string $type): static
+    {
+        $this->type = $type;
+        return $this;
     }
 
     public static function make(string $key): static

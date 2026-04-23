@@ -5,8 +5,6 @@
 
 <div class="overflow-x-auto">
 
-    @include('livewire.shared.partials.loading')
-
     <table class="table table-zebra w-full">
 
         <thead>
@@ -24,26 +22,9 @@
 
             <tr>
                 @foreach($this->columnsDef() as $col)
-
                     <td>
-                        @switch(true)
-
-                            @case($col instanceof BadgeColumn)
-                                <{!! $col->render($row) !!}
-                            @break
-
-                            @case($col instanceof ProgressColumn)
-                                <progress class="progress w-full"
-                                          value="{{ $row->{$col->key} }}"
-                                          max="100"></progress>
-                            @break
-
-                            @default
-                                {{ data_get($row, $col->key) }}
-
-                        @endswitch
+                        {!! $col->render($row) !!}
                     </td>
-
                 @endforeach
             </tr>
 

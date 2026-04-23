@@ -18,6 +18,25 @@ abstract class DataTable extends Component
     public int $perPage = 10;
     public int $page = 1;
 
+    //operadores por tipo
+    public array $operators = [
+        'string' => [
+            'contains' => 'Contiene',
+            'equals' => 'Es igual a',
+            'starts' => 'Empieza con',
+            'ends' => 'Termina con',
+        ],
+        'numeric' => [  
+            'equals' => '=',
+            'gt' => '>',
+            'lt' => '<',
+        ],
+        'enum' => [
+            'equals' => 'Es',
+            'not' => 'No es',
+        ],
+    ];
+
     // ── Métodos obligatorios ───────────────────────────────────────────────
     abstract protected function model(): string;
     abstract protected function columns(): array;
@@ -108,6 +127,19 @@ abstract class DataTable extends Component
         $this->page = 1;
     }
 
+    private function applyOperator($query, $column, $op, $value)
+    {
+        return match ($op) {
+            'contains' => $query->where($column, 'ilike', "%$value%"),
+            'equals'   => $query->where($column, '=', $value),
+            'starts'   => $query->where($column, 'ilike', "$value%"),
+            'ends'     => $query->where($column, 'ilike', "%$value"),
+            'gt'       => $query->where($column, '>', $value),
+            'lt'       => $query->where($column, '<', $value),
+            default    => $query->where($column, 'ilike', "%$value%"),
+        };
+    }
+
     // ── Query builder separado ─────────────────────────────────────────────
     protected function buildQuery(): Builder
     {
@@ -117,16 +149,36 @@ abstract class DataTable extends Component
             $query->with($with);
         }
 
-        // ── Filtros simples ───────────────────────────────────────────────
         foreach ($this->filters as $filter) {
-            if (!isset($filter['value']) || trim($filter['value']) === '') {
-                continue;
-            }
 
-            $query->where($filter['col'], 'like', "%{$filter['value']}%");
+            if (blank($filter['value'])) continue;
+
+            $col = collect($this->columnsDef())
+                ->firstWhere('key', $filter['col']);
+
+            if (!$col) continue;
+
+            $column = $col->key;
+            $op     = $filter['operator'] ?? 'contains';
+            $value  = $filter['value'];
+
+            $query->where(function ($q) use ($col, $column, $op, $value) {
+
+                if ($col instanceof \App\Support\DataTable\RelationColumn) {
+
+                    [$rel, $relCol] = explode('.', $col->relation);
+
+                    $q->whereHas($rel, function ($q2) use ($relCol, $op, $value) {
+                        $this->applyOperator($q2, $relCol, $op, $value);
+                    });
+
+                } else {
+                    $this->applyOperator($q, $column, $op, $value);
+                }
+
+            });
         }
 
-        // ── Sorting ───────────────────────────────────────────────────────
         if ($this->sortColumn) {
             $query->orderBy($this->sortColumn, $this->sortDirection);
         }
