@@ -21,7 +21,7 @@
                                 </option>
                             @endforeach
                         </select>
-                        <x-input-error for='unidad_medida_id' /> 
+                        <x-input-error for='year' /> 
                     </div>
 
                     <div class="w-full">
