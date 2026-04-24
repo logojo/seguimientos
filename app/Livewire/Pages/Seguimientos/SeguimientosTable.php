@@ -39,9 +39,9 @@ class SeguimientosTable extends DataTable
                 ->label('Estatus de registro')
                 ->type('enum')
                 ->colors([
-                    'Validada'  => 'pill-green',
-                    'Pendiente' => 'pill-gray',
-                    'Observada' => 'pill-yellow',
+                    'Validada'  => 'pill-green text-xs',
+                    'Pendiente' => 'pill-gray text-xs',
+                    'Observada' => 'pill-yellow text-xs',
                 ]),
             
             IconColumn::make('')

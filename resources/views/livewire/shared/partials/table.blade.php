@@ -1,12 +1,15 @@
-<div class="overflow-x-auto">
+<div class="border border-base-300 rounded-box overflow-auto">
 
-    <table class="table table-zebra w-full">
+    <table class="table table-zebra table-sm w-full">
 
-        <thead>
+        <thead class="bg-base-200/50">
         <tr>
             @foreach($this->visibleColumns() as $col)
                 <th wire:click="sort('{{ $col->key }}')" class="cursor-pointer">
-                    {{ $col->label }}
+                    <div class="inline-flex items-center gap-1.5">
+                        <span>{{ $col->label }}</span> 
+                        <span class="material-symbols-outlined opacity-40" style="font-size: 14px">mobiledata_arrows</span>
+                    </div>
                 </th>
             @endforeach
         </tr>
@@ -14,7 +17,7 @@
 
         <tbody>
         @forelse($this->rows as $row)
-            <tr>
+            <tr class="hover">
                 @foreach($this->visibleColumns() as $col)
                     <td>
                         {!! $col->render($row) !!}
@@ -28,7 +31,7 @@
 
     </table>
 
-    <div class="mt-3">
+    <div class="p-3">
         {{ $this->rows->links() }}
     </div>
 
