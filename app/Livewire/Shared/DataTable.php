@@ -32,6 +32,11 @@ abstract class DataTable extends Component
     #[Url(as: 'pp')]
     public int $perPage = 10;
 
+    #[Url(as: 'v')]
+    public string $viewToken = '';
+
+    #[Url(as: 'xf')]
+    public array $externalFilters = [];
 
     //operadores por tipo
     public array $operators = [
@@ -55,9 +60,6 @@ abstract class DataTable extends Component
         ],
     ];
 
-
-    #[Url(as: 'v')]
-    public string $viewToken = '';
 
     public function mount(): void
     {
@@ -87,6 +89,11 @@ abstract class DataTable extends Component
     }
 
     protected function with(): array
+    {
+        return [];
+    }
+
+    protected function externalFiltersConfig(): array
     {
         return [];
     }
@@ -145,6 +152,25 @@ abstract class DataTable extends Component
         $this->resetPage();
     }
 
+    public function setExternalFilter(string $key, $value): void
+    {
+        $this->externalFilters[$key] = $value;
+        $this->resetPage();
+    }
+
+    public function getFilterOptions(string $key): array
+    {
+        $config = $this->externalFiltersConfig()[$key] ?? [];
+
+        $options = $config['options'] ?? [];
+
+        if (is_callable($options)) {
+            return $options();
+        }
+
+        return $options;
+    }
+
     private function persistState(): void
     {
         $token = Str::random(8);
@@ -164,15 +190,20 @@ abstract class DataTable extends Component
         $this->viewToken = $token;
     }
 
-     public function updatedFilters(): void
+    public function updatedFilters(): void
     {
         $this->persistState();
         $this->resetPage();
     }
 
     // ── Sorting ────────────────────────────────────────────────────────────
-    public function sort(string $column): void
+    public function sort( string $column): void
     {
+        $col = collect($this->columnsDef())
+                ->firstWhere('key', $column);
+
+        if( !$col->sortable ) return;
+
         if ($this->sortColumn === $column) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
         } else {
@@ -221,6 +252,11 @@ abstract class DataTable extends Component
     }
 
     public function updatingPerPage()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedExternalFilters(): void
     {
         $this->resetPage();
     }
@@ -290,6 +326,26 @@ abstract class DataTable extends Component
 
         if ($this->sortColumn) {
             $query->orderBy($this->sortColumn, $this->sortDirection);
+        }
+
+        $query = $this->applyExternalFilters($query);
+
+        return $query;
+    }
+
+    protected function applyExternalFilters(Builder $query): Builder
+    {
+        foreach ($this->externalFilters as $key => $value) {
+
+            if (blank($value)) continue;
+
+            $config = $this->externalFiltersConfig()[$key] ?? null;
+
+            if (!$config) continue;
+
+            if (isset($config['query']) && is_callable($config['query'])) {
+                $config['query']($query, $value);
+            }
         }
 
         return $query;

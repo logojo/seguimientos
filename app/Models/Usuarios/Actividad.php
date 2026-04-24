@@ -22,6 +22,7 @@ class Actividad extends Model
         'actividad',
         'objetivo',
         'avance',
+        'year',
         'status',
         'user_assignment_id',
         'programa_id',

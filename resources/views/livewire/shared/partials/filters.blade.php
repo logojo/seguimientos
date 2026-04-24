@@ -13,7 +13,10 @@
             <select wire:change="updateFilter({{ $i }}, 'col', $event.target.value)"
                     class="select select-bordered select-sm">                
 
-                @foreach($columns as $c)
+                @foreach($columns as $c)    
+                    @if ( $c->key === 'actions' )
+                        @continue
+                    @endif           
                     <option value="{{ $c->key }}" @selected($filter['col'] === $c->key)>
                         {{ $c->label == '' ? 'Seguimiento' : $c->label}}
                     </option>

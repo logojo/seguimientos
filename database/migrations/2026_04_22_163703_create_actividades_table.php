@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('actividad');
             $table->string('objetivo');
+            $table->string('integer');
             $table->double('avance', 2);
             $table->enum('status', array_column(StatusActividadType::cases(), 'value'));
 

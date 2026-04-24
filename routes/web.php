@@ -22,6 +22,7 @@ Route::get('/auth-llave/logout', [LlaveController::class, 'logout'])->name('llav
 
 Route::get('/seguimientos', Seguimientos::class)->name('seguimientos');
 
+
 //===== End Rutas para autenticación con LlaveMX ==========
 Route::middleware('llave.auth')->group(function () {
     

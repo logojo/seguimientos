@@ -1,6 +1,6 @@
 <div class="border border-base-300 rounded-box overflow-auto">
 
-    <table class="table table-zebra table-sm w-full">
+    <table class="table table-sm w-full">
 
         <thead class="bg-base-200/50">
         <tr>
@@ -8,7 +8,14 @@
                 <th wire:click="sort('{{ $col->key }}')" class="cursor-pointer">
                     <div class="inline-flex items-center gap-1.5">
                         <span>{{ $col->label }}</span> 
-                        <span class="material-symbols-outlined opacity-40" style="font-size: 14px">mobiledata_arrows</span>
+
+                        @if( $col->sortable )
+                            <span class="material-symbols-outlined opacity-40" style="font-size: 14px">
+                                @if($sortColumn === $col->key)
+                                    {{ $sortDirection === 'asc' ? 'straight' : 'south' }}
+                                @else mobiledata_arrows @endif
+                            </span>
+                        @endif
                     </div>
                 </th>
             @endforeach
@@ -17,7 +24,7 @@
 
         <tbody>
         @forelse($this->rows as $row)
-            <tr class="hover">
+            <tr class="hover:bg-base-100">
                 @foreach($this->visibleColumns() as $col)
                     <td>
                         {!! $col->render($row) !!}

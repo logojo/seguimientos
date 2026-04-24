@@ -62,3 +62,11 @@ function confirm( $model ) {
     ->timer(10000)
     ->show();
 }
+
+function getYears(): array
+{
+    $startYear = 2025;
+    $currentYear = now()->year; 
+
+    return range($startYear, $currentYear);
+}

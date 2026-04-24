@@ -3,18 +3,16 @@
 namespace App\Livewire\Pages\Seguimientos;
 
 use App\Livewire\Shared\DataTable;
+use App\Models\Usuarios\Actividad;
 use App\Support\DataTable\Columns\ActionsColumn;
 use App\Support\DataTable\Columns\BadgeColumn;
 use App\Support\DataTable\Columns\IconColumn;
 use App\Support\DataTable\Columns\ProgressColumn;
 use App\Support\DataTable\Columns\RelationColumn;
 use App\Support\DataTable\Columns\TextColumn;
-use Carbon\Carbon;
 
 class SeguimientosTable extends DataTable
 {
-    public string $title   = 'Actividades';
-    public int    $perPage = 10;
 
     protected function model(): string
     {
@@ -31,6 +29,31 @@ class SeguimientosTable extends DataTable
         return ['updated_at','status','actividad', 'programa', 'dependencia'];
     }
 
+    protected function externalFiltersConfig(): array
+    {
+        return [
+
+            // Filtro por ejercicio
+            'year' => [
+                'label' => 'Ejercicio',
+                'type'  => 'select',
+                'options' => function () {
+                    return Actividad::query()
+                        ->select('year')
+                        ->distinct()
+                        ->orderBy('year', 'desc')
+                        ->pluck('year', 'year')
+                        ->toArray();
+                },
+
+                'query' => function ($query, $value) {
+                    $query->where('year', $value);
+                },
+            ],
+
+        ];
+    }
+
     protected function columns(): array
     {
         return [
@@ -38,11 +61,13 @@ class SeguimientosTable extends DataTable
             BadgeColumn::make('status')
                 ->label('Estatus de registro')
                 ->type('enum')
+                ->sortable()
                 ->colors([
                     'Validada'  => 'pill-green text-xs',
                     'Pendiente' => 'pill-gray text-xs',
                     'Observada' => 'pill-yellow text-xs',
                 ]),
+
             
             IconColumn::make('')
                  ->type('icon'),
@@ -63,10 +88,11 @@ class SeguimientosTable extends DataTable
                 
             ProgressColumn::make('avance')
                 ->label('Avance %')
-               ->type('numeric'),
+                ->type('numeric')
+                ->sortable(),
 
             ActionsColumn::make('actions')
-                ->label('Acciones')
+                ->label('Acciones')                
                 ->actions([
                     [
                         'label' => 'Editar',
@@ -105,61 +131,5 @@ class SeguimientosTable extends DataTable
     {
         // ejecutar  / redireccionar
     }
-
-    // protected function columns(): array
-    // {
-    //     return [
-    //          'updated_at' => [
-    //             'label'    => '',
-    //             'column'   => 'updated_at',
-    //             'width'    => '20px',
-    //             'sortable' => false,
-    //             'render'   => function($row) {
-    //                 $created = Carbon::parse($row->created_at);
-    //                 $updated = Carbon::parse($row->updated_at);
-
-    //                 if ($updated->eq($created)) {
-    //                     return '';
-    //                 }
-
-    //                 return "<span class='material-symbols-outlined text-warning' style='font-size:15px'>warning</span>";
-    //             },
-    //         ],
-    //         'status' => [
-    //             'label'    => 'Estado',
-    //             'column'   => 'status',
-    //             'sortable' => true,
-    //             'width'    => '110px',
-    //             'badge'    => [
-    //                 'Validada'  => 'pill-green',
-    //                 'Pendiente' => 'pill-gray',
-    //                 'Observada' => 'pill-yellow',
-    //             ],
-    //         ],
-    //         'actividad' => [
-    //             'label'    => 'Actividad',
-    //             'column'   => 'actividad',
-    //             'sortable' => true,
-    //         ],
-    //         'programa' => [
-    //             'label'    => 'Programa',
-    //             'relation' => 'programa.descripcion',
-    //             'sortable' => true,
-    //         ],
-    //         'dependencia' => [
-    //             'label'    => 'Dependencia',
-    //             'relation' => 'dependencia.descripcion',
-    //             'sortable' => true,
-    //         ],
-    //         'avance' => [
-    //             'label'    => 'Avance',
-    //             'column'   => 'avance',
-    //             'class'    => 'text-left',
-    //             'sortable' => false,
-    //             'progress' => true,
-    //         ],
-            
-    //     ];
-    // }
 
 }

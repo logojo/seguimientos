@@ -3,6 +3,8 @@
     {{-- IZQUIERDA: ACCIONES --}}
     <div class="flex items-center gap-2">
 
+        @include('livewire.shared.partials.external-filters')
+
         {{-- Agregar filtro --}}
         <button wire:click="addFilter" class="btn btn-sm btn-outline gap-2">
             + Añadir filtro
@@ -14,7 +16,7 @@
 
         {{-- Limpiar filtros --}}
         @if(count($filters))
-            <button wire:click="clearFilters" class="btn btn-sm btn-ghost">
+            <button wire:click="clearFilters" class="btn btn-sm btn-primary">
                 Limpiar
             </button>
         @endif

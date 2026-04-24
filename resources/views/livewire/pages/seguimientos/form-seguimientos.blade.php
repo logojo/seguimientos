@@ -12,6 +12,19 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-4">
 
                     <div class="w-full">
+                        <legend class="fieldset-legend text-sm font-bold text-neutral">Ejercicio</legend>
+                        <select class="select" wire:model="year">
+                            <option>--- Seleccione ---</option>
+                           @foreach(getYears() as $year)
+                                <option value="{{ $year}}">
+                                        {{ $year }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <x-input-error for='unidad_medida_id' /> 
+                    </div>
+
+                    <div class="w-full">
                         <legend class="fieldset-legend text-sm font-bold text-neutral">Nombre de la actividad</legend>
                         <label class="input w-full validator">
                             <span class="material-symbols-outlined text-primary">bubble</span>
@@ -25,7 +38,7 @@
                         </label>
                         <x-input-error for='actividad' /> 
                     </div>
-            
+
                     <div class="w-full">
                         <legend class="fieldset-legend text-sm font-bold text-neutral">Unidad de medida</legend>
                         <select class="select" wire:model="unidad_medida_id">

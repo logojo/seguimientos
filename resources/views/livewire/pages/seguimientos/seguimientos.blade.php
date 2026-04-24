@@ -3,12 +3,12 @@
     <h1 class="text-center text-3xl font-patria text-primary">Seguimiento a Programas para la Igualdad</h1>
 
     <x-divider>
-        <x-slot name="title">Actividades 2026</x-slot>
+        <x-slot name="title">Listado de Actividades</x-slot>
     </x-divider>
 
     <section class="my-10">
-        <div class="flex justify-end mt-8 gap-2 mb-5 mr-6">
-            @livewire('pages.seguimientos.form-seguimientos')
+        <div class="flex justify-end gap-2 mb-8 ">
+            @include('livewire.pages.seguimientos.form-seguimientos')
         </div>
         <livewire:pages.seguimientos.seguimientos-table />
     </section>
